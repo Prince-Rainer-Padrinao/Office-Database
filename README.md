@@ -13,6 +13,7 @@ http://localhost/phpmyadmin/index.php?route=/database/structure&db=peso_database
 
 
 copy to phpadmin - sql tab then hit go
+add peso_database
 
 CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
