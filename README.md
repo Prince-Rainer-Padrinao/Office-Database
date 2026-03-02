@@ -6,3 +6,7 @@ user link
 
 admin link
 http://localhost/PESOoffice_db/index.php
+
+database link
+http://localhost/phpmyadmin/index.php
+http://localhost/phpmyadmin/index.php?route=/database/structure&db=peso_database
