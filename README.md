@@ -2,7 +2,7 @@ Open XAMPP software
 click start for Apache and MySQL
 
 user link
-192.168.1.105/PESOoffice_db
+192.168.1.105/PESOoffice_db (depends on IPv4 Address of the host/admin)
 
 admin link
 http://localhost/PESOoffice_db/index.php
