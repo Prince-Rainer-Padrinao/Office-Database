@@ -1,6 +1,19 @@
 Open XAMPP software
 click start for Apache and MySQL
 
+USE MAIN PC - HOST PC
+
+1. click wifi icon on bottom right corner of th screen
+2. click properties icon
+3. scroll down and find "IPv4 address" 
+4. Copy the address number (example: 192.168.1.105)
+5. Type the URL in this format:
+
+192.168.1.105/PESOoffice_db 
+(example only, IPv4 address may change)
+
+
+
 user link
 192.168.1.105/PESOoffice_db (depends on IPv4 Address of the host/admin)
 
