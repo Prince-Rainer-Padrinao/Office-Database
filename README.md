@@ -3,7 +3,7 @@ click start for Apache and MySQL
 
 USE MAIN PC - HOST PC
 
-1. click wifi icon on bottom right corner of th screen
+1. click wifi icon on bottom right corner of the screen
 2. click properties icon
 3. scroll down and find "IPv4 address" 
 4. Copy the address number (example: 192.168.1.105)
