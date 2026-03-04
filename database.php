@@ -2,6 +2,29 @@
 session_start();
 $conn = mysqli_connect("localhost", "root", "", "peso_database");
 
+// --- EXPORT TO EXCEL (CSV) ---
+if (isset($_GET['export']) && $_GET['export'] == 'excel') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="OFW_Profiles_Export.csv"');
+    $output = fopen('php://output', 'w');
+    
+    $query = "SELECT * FROM ofw_profiles ORDER BY id DESC";
+    $result = mysqli_query($conn, $query);
+    
+    $fields = mysqli_fetch_fields($result);
+    $headers = [];
+    foreach ($fields as $field) {
+        $headers[] = strtoupper(str_replace('_', ' ', $field->name));
+    }
+    fputcsv($output, $headers);
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        fputcsv($output, $row);
+    }
+    fclose($output);
+    exit;
+}
+
 // Handle Logout
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -54,11 +77,12 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
         th { background-color: #3b5336; color: white; }
         .btn { padding: 5px 10px; background: #dcdcdc; border: 1px solid #000; cursor: pointer; text-decoration: none; color: black; display: inline-block; font-size: 13px;}
         .del-btn { background: #ff4d4d; color: white; font-weight: bold; }
+        .edit-btn { background: #ffca28; color: black; font-weight: bold; } /* NEW EDIT BUTTON STYLE */
         .expand-btn { background-color: #0563C1; color: white; font-weight: bold; }
+        .excel-btn { background: #217346; color: white; font-weight: bold; }
         .status-active { color: #217346; font-weight: bold; }
         .status-inactive { color: #c00; font-weight: bold; }
         
-        /* The CSS Grid for the Expanded Row Details */
         .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background-color: #eef2ed; padding: 20px; border: 2px solid #3b5336; margin: 5px 0; }
         .details-section { background: white; padding: 15px; border: 1px solid #ccc; }
         .details-section h4 { margin-top: 0; color: #3b5336; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
@@ -92,6 +116,7 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>📊 OFW Profiles (Mode: <?php echo strtoupper($_SESSION['role']); ?>)</h2>
             <div>
+                <a href="database.php?export=excel" class="btn excel-btn">📥 Export to Excel</a>
                 <a href="index.php" class="btn">➕ Add New</a>
                 <a href="database.php?logout=true" class="btn" style="background-color: #444; color: white;">🚪 Logout</a>
             </div>
@@ -116,7 +141,6 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
                 echo "<td>{$row['passport_number']}</td>";
                 echo "<td>{$row['country_employment']}</td>";
                 
-                // --- THE STATUS COLUMN & SMART TOGGLE ---
                 echo "<td><span class='{$status_class}'>{$status}</span><br>";
                 if ($_SESSION['role'] === 'admin') {
                     if ($is_active) {
@@ -127,15 +151,18 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
                 }
                 echo "</td>";
                 
-                // --- THE ACTION COLUMN ---
+                // --- THE UPDATED ACTION COLUMN ---
                 echo "<td>";
                 echo "<button type='button' class='btn expand-btn' onclick='toggleDetails({$row['id']})'>🔍 Expand</button> ";
+                
                 if ($_SESSION['role'] === 'admin') {
+                    // NEW EDIT BUTTON IS HERE
+                    echo "<a href='edit.php?id={$row['id']}' class='btn edit-btn'>✏️ Edit</a> ";
                     echo "<a href='database.php?delete={$row['id']}' class='btn del-btn' onclick='return confirm(\"Delete permanently?\")'>🗑️ Delete</a>";
                 }
                 echo "</td></tr>";
 
-                // --- THE 8-SECTION EXPANDED ROW ---
+                // --- EXPANDED ROW LOGIC REMAINS THE SAME ---
                 echo "<tr id='details-{$row['id']}' style='display: none;'>";
                 echo "<td colspan='6'>";
                 echo "<div class='details-grid'>";
