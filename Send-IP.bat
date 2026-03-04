@@ -11,7 +11,7 @@ echo Your IP is %IP%
 echo Opening Gmail in Chrome...
 
 :: Recipients (You can add more by separating them with a comma)
-set TO=________@gmail.com,________@gmail.com
+set TO=tourismpaombong@gmail.com,peso_paombong@yahoo.com
 
 :: Set Subject and Body (Using %%20 to act as spaces for the web URL)
 set SUBJECT=New%%20Office%%20Database%%20Link
