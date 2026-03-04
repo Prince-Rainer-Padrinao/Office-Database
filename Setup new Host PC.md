@@ -51,8 +51,59 @@ Click Create
 
 Open the SQL tab:
 
-CREATE TABLE ofw_profiles ( id INT AUTO_INCREMENT PRIMARY KEY, last_name VARCHAR(100), first_name VARCHAR(100), middle_name VARCHAR(100), sex VARCHAR(20), dob DATE, age INT, civil_status VARCHAR(50), contact_number VARCHAR(50), email VARCHAR(100), facebook VARCHAR(100), ph_address TEXT, barangay VARCHAR(100), municipality VARCHAR(100), province VARCHAR(100), passport_number VARCHAR(50), passport_expiry DATE, oec_number VARCHAR(50), dmw_number VARCHAR(50), sss_number VARCHAR(50), philhealth_number VARCHAR(50), pagibig_number VARCHAR(50), current_status VARCHAR(100), country_employment VARCHAR(100), job_position VARCHAR(100), employer_name VARCHAR(255), employment_type VARCHAR(50), deployment_date DATE, contract_duration VARCHAR(100), monthly_salary VARCHAR(100), education VARCHAR(100), field_of_study VARCHAR(100), tesda_cert VARCHAR(100), other_skills TEXT, kin_name VARCHAR(100), kin_relationship VARCHAR(50), kin_contact VARCHAR(50), dependents INT, availed_assistance VARCHAR(10), assistance_specify TEXT, concerns TEXT, concerns_others TEXT, emergency_contact_name VARCHAR(100), emergency_relationship VARCHAR(50), emergency_contact_number VARCHAR(50), privacy_consent VARCHAR(20), signature VARCHAR(100), date_signed DATE );
+DROP TABLE IF EXISTS employees;
 
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    last_name VARCHAR(100),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    sex VARCHAR(20),
+    dob DATE,
+    age INT,
+    civil_status VARCHAR(50),
+    contact_number VARCHAR(50),
+    email VARCHAR(100),
+    facebook VARCHAR(100),
+    ph_address TEXT,
+    barangay VARCHAR(100),
+    municipality VARCHAR(100),
+    province VARCHAR(100),
+    passport_number VARCHAR(100),
+    passport_expiry DATE,
+    oec_number VARCHAR(100),
+    dmw_number VARCHAR(100),
+    sss_number VARCHAR(100),
+    philhealth_number VARCHAR(100),
+    pagibig_number VARCHAR(100),
+    current_status VARCHAR(100),
+    country_employment VARCHAR(100),
+    job_position VARCHAR(100),
+    employer_name VARCHAR(150),
+    employment_type VARCHAR(50),
+    deployment_date DATE,
+    contract_duration VARCHAR(100),
+    monthly_salary VARCHAR(100),
+    education VARCHAR(100),
+    field_of_study VARCHAR(100),
+    tesda_cert VARCHAR(100),
+    other_skills TEXT,
+    kin_name VARCHAR(150),
+    kin_relationship VARCHAR(100),
+    kin_contact VARCHAR(50),
+    dependents INT,
+    availed_assistance VARCHAR(10),
+    assistance_specify TEXT,
+    concerns TEXT,
+    concerns_others TEXT,
+    emergency_contact_name VARCHAR(150),
+    emergency_relationship VARCHAR(100),
+    emergency_contact_number VARCHAR(50),
+    privacy_consent VARCHAR(20),
+    signature VARCHAR(150),
+    date_signed DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'Active'
+);
 
 Click Go
 
