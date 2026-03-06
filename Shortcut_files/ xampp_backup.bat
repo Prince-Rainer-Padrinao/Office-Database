@@ -1,9 +1,10 @@
 @echo off
 :: --- CONFIGURATION ---
 set DB_NAME=peso_database
-set BACKUP_PATH=C:\xampp\backups
+:: Routes dynamically to the current user's Documents folder
+set BACKUP_PATH=%USERPROFILE%\Documents\OFW_Database_Backups
 set MYSQL_BIN=C:\xampp\mysql\bin\mysqldump.exe
-set LOG_FILE=C:\xampp\backups\backup_log.txt
+set LOG_FILE=%USERPROFILE%\Documents\OFW_Database_Backups\backup_log.txt
 :: ---------------------
 
 :: Create the backup folder if it doesn't exist
