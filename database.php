@@ -2,6 +2,120 @@
 session_start();
 $conn = mysqli_connect("localhost", "root", "", "peso_database");
 
+// --- SMART IMPORT FROM GOOGLE FORMS (CSV) ---
+if (isset($_POST["import_csv"]) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    if($_FILES['csv_file']['name']) {
+        $filename = explode(".", $_FILES['csv_file']['name']);
+        if(strtolower(end($filename)) == "csv") {
+            $handle = fopen($_FILES['csv_file']['tmp_name'], "r");
+            
+            // Skip the header row from Google Sheets
+            fgetcsv($handle); 
+            
+            $added = 0;
+            $skipped = 0;
+
+            while($data = fgetcsv($handle)) {
+                // Skip empty rows at the bottom of the CSV
+                if(count($data) < 47) continue;
+
+                // Function to clean special characters (like apostrophes in names)
+                $clean = function($str) use ($conn) { return mysqli_real_escape_string($conn, $str ?? ''); };
+
+                // Map Google Forms Columns to Variables (Index 0 is Timestamp)
+                $last_name = $clean($data[1]);
+                $first_name = $clean($data[2]);
+                $middle_name = $clean($data[3]);
+                $sex = $clean($data[4]);
+                $dob = $clean($data[5]);
+                $age = (int)$clean($data[6]);
+                $civil_status = $clean($data[7]);
+                $contact_number = $clean($data[8]);
+                $email = $clean($data[9]);
+                $facebook = $clean($data[10]);
+                $ph_address = $clean($data[11]);
+                $barangay = $clean($data[12]);
+                $municipality = $clean($data[13]);
+                $province = $clean($data[14]);
+                
+                $passport_number = $clean($data[15]);
+                
+                // --- DUPLICATE CHECK ---
+                $check = mysqli_query($conn, "SELECT id FROM ofw_profiles WHERE passport_number = '$passport_number'");
+                if (mysqli_num_rows($check) > 0) {
+                    $skipped++; // Already exists, skip to the next row!
+                    continue;
+                }
+
+                $passport_expiry = $clean($data[16]);
+                $oec_number = $clean($data[17]);
+                $dmw_number = $clean($data[18]);
+                $sss_number = $clean($data[19]);
+                $philhealth_number = $clean($data[20]);
+                $pagibig_number = $clean($data[21]);
+
+                $current_status = $clean($data[22]);
+                $country_employment = $clean($data[23]);
+                $job_position = $clean($data[24]);
+                $employer_name = $clean($data[25]);
+                $employment_type = $clean($data[26]);
+                $deployment_date = $clean($data[27]);
+                $contract_duration = $clean($data[28]);
+                $monthly_salary = $clean($data[29]);
+
+                $education = $clean($data[30]);
+                $field_of_study = $clean($data[31]);
+                $tesda_cert = $clean($data[32]);
+                $other_skills = $clean($data[33]);
+
+                $kin_name = $clean($data[34]);
+                $kin_relationship = $clean($data[35]);
+                $kin_contact = $clean($data[36]);
+                $dependents = (int)$clean($data[37]);
+
+                $availed_assistance = $clean($data[38]);
+                $assistance_specify = $clean($data[39]);
+                $concerns = $clean($data[40]);
+                $concerns_others = $clean($data[41]);
+
+                $emergency_contact_name = $clean($data[42]);
+                $emergency_relationship = $clean($data[43]);
+                $emergency_contact_number = $clean($data[44]);
+
+                $privacy_consent = $clean($data[45]);
+                $signature = $clean($data[46]);
+                $date_signed = $clean($data[47]);
+
+                // Insert the new person!
+                $sql = "INSERT INTO ofw_profiles (
+                    last_name, first_name, middle_name, sex, dob, age, civil_status, contact_number, email, facebook, ph_address, barangay, municipality, province, 
+                    passport_number, passport_expiry, oec_number, dmw_number, sss_number, philhealth_number, pagibig_number, 
+                    current_status, country_employment, job_position, employer_name, employment_type, deployment_date, contract_duration, monthly_salary, 
+                    education, field_of_study, tesda_cert, other_skills, 
+                    kin_name, kin_relationship, kin_contact, dependents, 
+                    availed_assistance, assistance_specify, concerns, concerns_others, 
+                    emergency_contact_name, emergency_relationship, emergency_contact_number, 
+                    privacy_consent, signature, date_signed
+                ) VALUES (
+                    '$last_name', '$first_name', '$middle_name', '$sex', '$dob', $age, '$civil_status', '$contact_number', '$email', '$facebook', '$ph_address', '$barangay', '$municipality', '$province', 
+                    '$passport_number', '$passport_expiry', '$oec_number', '$dmw_number', '$sss_number', '$philhealth_number', '$pagibig_number', 
+                    '$current_status', '$country_employment', '$job_position', '$employer_name', '$employment_type', '$deployment_date', '$contract_duration', '$monthly_salary', 
+                    '$education', '$field_of_study', '$tesda_cert', '$other_skills', 
+                    '$kin_name', '$kin_relationship', '$kin_contact', $dependents, 
+                    '$availed_assistance', '$assistance_specify', '$concerns', '$concerns_others', 
+                    '$emergency_contact_name', '$emergency_relationship', '$emergency_contact_number', 
+                    '$privacy_consent', '$signature', '$date_signed'
+                )";
+                
+                mysqli_query($conn, $sql);
+                $added++;
+            }
+            fclose($handle);
+            echo "<script>alert('✅ Import Complete!\\n\\nAdded: $added new profiles\\nSkipped: $skipped duplicates'); window.location.href='database.php';</script>";
+        }
+    }
+}
+
 // --- EXPORT TO EXCEL (CSV) ---
 if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     header('Content-Type: text/csv; charset=utf-8');
@@ -77,9 +191,10 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
         th { background-color: #3b5336; color: white; }
         .btn { padding: 5px 10px; background: #dcdcdc; border: 1px solid #000; cursor: pointer; text-decoration: none; color: black; display: inline-block; font-size: 13px;}
         .del-btn { background: #ff4d4d; color: white; font-weight: bold; }
-        .edit-btn { background: #ffca28; color: black; font-weight: bold; } /* NEW EDIT BUTTON STYLE */
+        .edit-btn { background: #ffca28; color: black; font-weight: bold; } 
         .expand-btn { background-color: #0563C1; color: white; font-weight: bold; }
         .excel-btn { background: #217346; color: white; font-weight: bold; }
+        .import-btn { background: #0563C1; color: white; font-weight: bold; }
         .status-active { color: #217346; font-weight: bold; }
         .status-inactive { color: #c00; font-weight: bold; }
         
@@ -113,10 +228,18 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
         <?php endif; ?>
     <?php else: ?>
 
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <h2>📊 OFW Profiles (Mode: <?php echo strtoupper($_SESSION['role']); ?>)</h2>
-            <div>
-                <a href="database.php?export=excel" class="btn excel-btn">📥 Export to Excel</a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <form method="POST" enctype="multipart/form-data" style="margin: 0; padding: 5px; border: 1px dashed #3b5336; background-color: #e8f4ea;">
+                        <input type="file" name="csv_file" accept=".csv" required style="font-size: 12px;">
+                        <button type="submit" name="import_csv" class="btn import-btn">📂 Import CSV</button>
+                    </form>
+                <?php endif; ?>
+
+                <a href="database.php?export=excel" class="btn excel-btn">📥 Export</a>
                 <a href="index.php" class="btn">➕ Add New</a>
                 <a href="database.php?logout=true" class="btn" style="background-color: #444; color: white;">🚪 Logout</a>
             </div>
@@ -151,18 +274,16 @@ if (isset($_GET['delete']) && isset($_SESSION['role']) && $_SESSION['role'] === 
                 }
                 echo "</td>";
                 
-                // --- THE UPDATED ACTION COLUMN ---
                 echo "<td>";
                 echo "<button type='button' class='btn expand-btn' onclick='toggleDetails({$row['id']})'>🔍 Expand</button> ";
                 
                 if ($_SESSION['role'] === 'admin') {
-                    // NEW EDIT BUTTON IS HERE
                     echo "<a href='edit.php?id={$row['id']}' class='btn edit-btn'>✏️ Edit</a> ";
                     echo "<a href='database.php?delete={$row['id']}' class='btn del-btn' onclick='return confirm(\"Delete permanently?\")'>🗑️ Delete</a>";
                 }
                 echo "</td></tr>";
 
-                // --- EXPANDED ROW LOGIC REMAINS THE SAME ---
+                // --- EXPANDED ROW LOGIC ---
                 echo "<tr id='details-{$row['id']}' style='display: none;'>";
                 echo "<td colspan='6'>";
                 echo "<div class='details-grid'>";
